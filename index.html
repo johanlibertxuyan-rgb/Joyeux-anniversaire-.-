@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Ma Souveraine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0b0408;
+      font-family: 'Cormorant Garamond', serif;
+      color: #f2e3e3;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* fond floral doux */
+    .bg-photo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.2;
+      filter: brightness(0.7) saturate(0.3) sepia(0.4);
+      pointer-events: none;
+    }
+
+    .overlay-soft {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 40%, rgba(30, 8, 18, 0.6) 0%, #0b0408 90%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── SPLASH ── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: #0b0408f2;
+      backdrop-filter: blur(6px);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.8rem;
+      transition: opacity 1.2s ease, visibility 1.2s ease;
+      text-align: center;
+      padding: 2rem;
+    }
+    #splash.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .splash-icon {
+      font-size: 4.2rem;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px #d4a0b0);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .splash-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: clamp(1.6rem, 5vw, 2.8rem);
+      color: #eed4d4;
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 20px #b34a5e33;
+    }
+    .splash-sub {
+      font-size: 1rem;
+      color: #b89797;
+      letter-spacing: 0.2em;
+      font-style: italic;
+    }
+    .btn-enter {
+      background: transparent;
+      border: 1.5px solid #b67a7a;
+      color: #ecc8c8;
+      padding: 0.9rem 2.8rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: 0.3s;
+      border-radius: 40px;
+      backdrop-filter: blur(4px);
+      background: rgba(180, 80, 100, 0.08);
+      box-shadow: 0 0 20px #b34a5e22;
+    }
+    .btn-enter:hover {
+      background: #b34a5e;
+      border-color: #d9a0a0;
+      color: #fff;
+      box-shadow: 0 0 40px #b34a5e88;
+      transform: scale(1.02);
+    }
+
+    /* particules douces */
+    #particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .particle {
+      position: absolute;
+      width: 5px; height: 5px;
+      background: radial-gradient(circle, #f0c4c4, #b34a5e);
+      border-radius: 50%;
+      animation: floatUp linear infinite;
+      opacity: 0;
+      box-shadow: 0 0 6px #e8a0a0;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.3); opacity: 0; }
+      15% { opacity: 0.7; }
+      85% { opacity: 0.5; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    /* confetti élégant */
+    .confetti {
+      position: fixed;
+      top: -10px;
+      pointer-events: none;
+      z-index: 999;
+      animation: confettiFall linear forwards;
+      font-size: 1.2rem;
+      filter: drop-shadow(0 0 4px #d4a0a0);
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      text-align: center;
+      padding: 2rem;
+      z-index: 3;
+    }
+    .hero-sub {
+      font-size: 1rem;
+      color: #c2a0a0;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-weight: 300;
+      animation: fadeIn 1.8s ease forwards;
+      opacity: 0;
+    }
+    .hero-line {
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #b67a7a, transparent);
+      margin: 1rem auto;
+      animation: fadeIn 2s ease forwards;
+      opacity: 0;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: clamp(2.6rem, 9vw, 5.2rem);
+      color: #f0d4d4;
+      text-shadow: 0 0 30px #b34a5e55, 0 0 60px #b34a5e22;
+      letter-spacing: 0.04em;
+      animation: fadeSlideUp 1.4s ease forwards;
+      opacity: 0;
+      line-height: 1.1;
+      margin: 0.3rem 0;
+    }
+    .hero-name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: clamp(1.2rem, 3.5vw, 2.2rem);
+      color: #dbb0b0;
+      letter-spacing: 0.15em;
+      animation: fadeSlideUp 1.6s ease forwards;
+      opacity: 0;
+      margin-top: 0.2rem;
+    }
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #a07a7a;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      animation: bounce 2.4s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* sections */
+    section {
+      position: relative;
+      z-index: 5;
+      padding: 4rem 1.5rem;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      color: #b67a7a;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+      font-weight: 300;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 0.5rem 0 2rem;
+    }
+    .divider-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(to right, transparent, #b67a7a);
+    }
+    .divider-line.right {
+      background: linear-gradient(to left, transparent, #b67a7a);
+    }
+    .divider-icon {
+      color: #c08080;
+      font-size: 1.1rem;
+    }
+
+    /* message */
+    #message {
+      padding-left: 1.8rem;
+      border-left: 2px solid #b34a5e55;
+      background: rgba(20, 8, 12, 0.4);
+      backdrop-filter: blur(1px);
+      border-radius: 0 18px 18px 0;
+      padding: 1.8rem;
+    }
+    .msg-text {
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      line-height: 1.9;
+      color: #eedcdc;
+      font-weight: 300;
+      font-style: italic;
+    }
+    .signature {
+      margin-top: 1.8rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      color: #c9a0a0;
+      text-align: right;
+      letter-spacing: 0.1em;
+    }
+
+    /* musique */
+    .music-player {
+      background: linear-gradient(145deg, #1a0c10cc, #12080ccc);
+      backdrop-filter: blur(4px);
+      border: 1px solid #b34a5e44;
+      padding: 2rem 1.5rem;
+      border-radius: 30px;
+      max-width: 480px;
+      margin: 1.5rem auto;
+      box-shadow: 0 8px 32px #00000055;
+    }
+    .music-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      color: #e0baba;
+      letter-spacing: 0.1em;
+    }
+    .music-note {
+      font-size: 0.85rem;
+      color: #b89797;
+      font-style: italic;
+      margin: 0.5rem 0 1.2rem;
+    }
+    .btn-soft {
+      background: #b34a5e33;
+      border: 1px solid #b67a7a;
+      color: #f0d4d4;
+      padding: 0.7rem 1.8rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: 0.3s;
+      border-radius: 40px;
+      backdrop-filter: blur(4px);
+      width: 100%;
+    }
+    .btn-soft:hover {
+      background: #b34a5e;
+      border-color: #d9a0a0;
+      color: #fff;
+      box-shadow: 0 0 30px #b34a5e66;
+    }
+
+    /* cadeau */
+    .gift-box-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+    .gift-box {
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(145deg, #2a121c, #160a10);
+      border: 2px solid #b67a7a;
+      border-radius: 20px 20px 8px 8px;
+      position: relative;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 8px 30px #b34a5e33;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gift-box:hover {
+      transform: scale(1.04);
+      border-color: #d9a0a0;
+      box-shadow: 0 0 50px #b34a5e66;
+    }
+    .gift-ribbon-h {
+      position: absolute;
+      top: 50%; left: 10%; right: 10%;
+      height: 3px;
+      background: #d9a0a0;
+      transform: translateY(-50%);
+      border-radius: 4px;
+    }
+    .gift-ribbon-v {
+      position: absolute;
+      left: 50%; top: 10%; bottom: 10%;
+      width: 3px;
+      background: #d9a0a0;
+      transform: translateX(-50%);
+      border-radius: 4px;
+    }
+    .gift-bow {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      filter: drop-shadow(0 0 6px #d4a0a0);
+    }
+    .gift-label {
+      color: #b89797;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 0.8rem;
+      font-weight: 300;
+    }
+    .gift-heart {
+      font-size: 2.2rem;
+      color: #d4a0a0;
+      animation: pulse 2s ease-in-out infinite;
+      text-shadow: 0 0 20px #b34a5e66;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* love message */
+    .love-message {
+      margin-top: 2rem;
+      padding: 2rem 1.5rem;
+      background: linear-gradient(145deg, #1a0c10dd, #0b0408dd);
+      border: 1px solid #b67a7a;
+      border-radius: 40px 12px 40px 12px;
+      backdrop-filter: blur(8px);
+      text-align: center;
+      animation: fadeSlideUp 0.8s ease;
+    }
+    .love-message h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #ecc8c8;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .love-message p {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: #eedcdc;
+      line-height: 1.7;
+    }
+
+    /* modal password */
+    #pw-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 2, 5, 0.92);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1.5rem;
+      backdrop-filter: blur(6px);
+    }
+    #pw-overlay.active { display: flex; }
+    .pw-box {
+      background: linear-gradient(145deg, #1a0c10, #0b0408);
+      border: 1px solid #b67a7a;
+      border-radius: 30px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      max-width: 380px;
+      width: 90%;
+      box-shadow: 0 0 60px #b34a5e44;
+    }
+    .pw-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: #dbb0b0;
+      letter-spacing: 0.1em;
+    }
+    .pw-subtitle {
+      font-size: 0.85rem;
+      color: #b89797;
+      font-style: italic;
+      margin: 0.5rem 0 1.8rem;
+    }
+    .pw-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: none;
+      border-bottom: 2px solid #b34a5e66;
+      color: #f0d4d4;
+      padding: 0.7rem 1rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      text-align: center;
+      outline: none;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      border-radius: 0;
+    }
+    .pw-input:focus {
+      border-bottom-color: #d9a0a0;
+    }
+    .pw-error {
+      color: #d48a8a;
+      font-size: 0.8rem;
+      font-style: italic;
+      min-height: 1.2rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem 2rem;
+      color: #7a5a5a;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      border-top: 1px solid #1a0c10;
+      position: relative;
+      z-index: 5;
+      background: rgba(8, 2, 5, 0.5);
+    }
+    footer strong {
+      color: #c9a0a0;
+      font-weight: 400;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      .gift-box { width: 120px; height: 120px; }
+      .pw-box { padding: 2rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<img class="bg-photo" src="https://i.ibb.co/yFWFLzRC/ecf8eea37dd0.jpg" alt="fond floral doux">
+<div class="overlay-soft"></div>
+
+<div id="particles"></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-icon">🕊️</div>
+  <p class="splash-title">Pour Toi, Ma Souveraine</p>
+  <p class="splash-sub">Une petite étincelle pour ton cœur</p>
+  <button class="btn-enter" id="enterBtn">✦ Ouvre ton présent ✦</button>
+</div>
+
+<!-- HERO -->
+<div id="hero">
+  <p class="hero-sub">Ta famille t'aime</p>
+  <div class="hero-line"></div>
+  <h1 class="hero-title">Joyeux Anniversaire</h1>
+  <p class="hero-name">✦ Abate Irène ✦</p>
+  <div class="hero-line"></div>
+  <div class="scroll-hint">↓ effleure ↓</div>
+</div>
+
+<!-- MESSAGE -->
+<section>
+  <div class="reveal">
+    <p class="section-label">✦ Pour celle qui est précieuse</p>
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-icon">🖤</span>
+      <div class="divider-line right"></div>
+    </div>
+    <div id="message">
+      <p class="msg-text">
+        Ma petite sœur d'amour,<br><br>
+        En ce jour où le temps semble suspendre son souffle, je ne peux que m'incliner devant la grâce qui t'habite. Tu es cette lumière douce et insaisissable, celle qui éclaire même les jours les plus gris. Ta présence est un poème que la vie écrit lentement, avec des mots de résilience et de noblesse.<br><br>
+        Te voir grandir, c'est assister à l'éclosion d'une âme rare, d'une reine au cœur pur. Ta force silencieuse est une forteresse, ta douceur un refuge. Dans ce monde parfois bruyant, tu es une mélodie apaisante.<br><br>
+        Que cette année t'apporte tout ce que ton cœur désire, et plus encore. Que les étoiles veillent sur toi, que la paix t'accompagne, et que l'amour t'enveloppe chaque jour. Tu es unique, précieuse, et infiniment aimée.<br><br>
+        Joyeux anniversaire, ma souveraine. 🖤
+      </p>
+      <p class="signature">— La famille Abate</p>
+    </div>
+  </div>
+</section>
+
+<!-- MUSIQUE -->
+<section id="music-section">
+  <div class="reveal">
+    <p class="section-label">✦ Une douce mélodie</p>
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-icon">🎵</span>
+      <div class="divider-line right"></div>
+    </div>
+    <div class="music-player">
+      <p class="music-title">🎶 Pour toi, ce soir</p>
+      <p class="music-note">Un son qui murmure ton nom</p>
+      <button class="btn-soft" id="sound-btn">🎧 écouter la musique</button>
+      <audio id="audio-player" src="https://files.catbox.moe/5vdkp6.mp3" loop preload="auto"></audio>
+    </div>
+  </div>
+</section>
+
+<!-- CADEAU -->
+<section id="gift-section">
+  <div class="reveal">
+    <p class="section-label">✦ Un petit quelque chose</p>
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-icon">🎁</span>
+      <div class="divider-line right"></div>
+    </div>
+    <div class="gift-box-wrapper">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+        <div class="gift-box" onclick="openGiftBox()">
+          <div class="gift-bow">🎀</div>
+          <div class="gift-ribbon-h"></div>
+          <div class="gift-ribbon-v"></div>
+          <span class="gift-heart">🖤</span>
+        </div>
+        <p class="gift-label">Cadeau pour toi</p>
+        <div id="gift-reveal" style="display:none; width:100%;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>avec tout mon cœur — <strong>Denis</strong></p>
+  <p style="margin-top:0.4rem;font-size:0.65rem;">soutenu par ta famille</p>
+</footer>
+
+<!-- MODAL PASSWORD -->
+<div id="pw-overlay">
+  <div class="pw-box">
+    <p class="pw-title">🔐 Pour toi, ma sœur</p>
+    <p class="pw-subtitle">Entre le mot doux pour dévoiler ton cadeau</p>
+    <input class="pw-input" id="pw-input" type="text" placeholder="code secret" autocomplete="off">
+    <p class="pw-error" id="pw-error"></p>
+    <button class="btn-soft" onclick="checkPassword()" style="width:100%; margin-top:0.3rem;">ouvrir 🖤</button>
+  </div>
+</div>
+
+<script>
+  // ── MOT DE PASSE ──
+  const GIFT_PASSWORD = "Love you";
+
+  // ── AUDIO ──
+  let soundOn = false;
+  const audioEl = document.getElementById('audio-player');
+  const soundBtn = document.getElementById('sound-btn');
+
+  // ── PARTICULES DOUCES ──
+  const pContainer = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (8 + Math.random() * 14) + 's';
+    p.style.animationDelay = (Math.random() * 10) + 's';
+    p.style.width = p.style.height = (3 + Math.random() * 5) + 'px';
+    pContainer.appendChild(p);
+  }
+
+  // ── CONFETTI ──
+  const emojis = ['🕊️','🌹','✨','🖤','🎂','🌸','💫','🍂','🎀','🌙'];
+  function launchConfetti() {
+    for (let i = 0; i < 50; i++) {
+      setTimeout(() => {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.animationDuration = (3 + Math.random() * 4) + 's';
+        c.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 6000);
+      }, i * 50);
+    }
+  }
+
+  // ── SPLASH + AUDIO ──
+  function enterSite() {
+    if (audioEl) {
+      audioEl.play().then(() => {
+        soundOn = true;
+        soundBtn.innerHTML = '🔊 douceur en cours (cliquer pour couper)';
+      }).catch(() => {
+        soundOn = false;
+        soundBtn.innerHTML = '🔇 cliquer pour écouter';
+      });
+    }
+    document.getElementById('splash').classList.add('hide');
+    launchConfetti();
+    setTimeout(() => launchConfetti(), 700);
+  }
+
+  document.getElementById('enterBtn').addEventListener('click', enterSite);
+
+  function tryAutoAudio() {
+    if (!document.getElementById('splash').classList.contains('hide')) return;
+    if (audioEl.paused && !soundOn) {
+      audioEl.play().catch(() => {});
+    }
+  }
+  document.body.addEventListener('click', tryAutoAudio);
+  document.body.addEventListener('touchstart', tryAutoAudio);
+
+  // ── TOGGLE MUSIQUE ──
+  function toggleSound() {
+    if (!audioEl) return;
+    if (soundOn) {
+      audioEl.pause();
+      soundOn = false;
+      soundBtn.innerHTML = '🔇 son coupé — cliquer pour réécouter';
+    } else {
+      audioEl.play().then(() => {
+        soundOn = true;
+        soundBtn.innerHTML = '🔊 douceur en cours (cliquer pour couper)';
+      }).catch(() => {
+        soundBtn.innerHTML = '🔇 réessayer plus tard';
+      });
+    }
+  }
+  soundBtn.addEventListener('click', toggleSound);
+
+  // ── REVEAL SCROLL ──
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  reveals.forEach(r => observer.observe(r));
+
+  // ── GIFT ──
+  function openG
